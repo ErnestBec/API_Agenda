@@ -6,3 +6,4 @@ passlib
 pyjwt
 bson
 pymongo
+urllib
