@@ -19,6 +19,7 @@ def nuevo_usuario(usuario):
     ususario_insertado= db.Users.find_one({"_id":nuevo_usuario})
     return JSONResponse(content=SchemaUser(ususario_insertado), status_code=201)
 
+
 def get_all_users():
     users = db.Users.find()
     list_users = list(users)
@@ -54,6 +55,35 @@ def nuevo_contacto(email,contact):
     nuevo_usuario = db_user.contactos.insert_one(contact).inserted_id
     ususario_insertado= db_user.contactos.find_one({"_id":nuevo_usuario})
     return JSONResponse(content=SchemaContact(ususario_insertado), status_code=201)
+
+def update_contact(id_contacto,contact_update,email):
+    user_log = db.Users.find_one({"correo":email["correo"]})
+    user_log= dict(user_log)
+    contact_update=dict(contact_update)
+    contact_update["direccion"]=dict(contact_update["direccion"])
+    # Construye la cadena de conexión
+    connection_string = user_log["url"] 
+    # Conecta a MongoDB Atlass
+    client = MongoClient(connection_string)
+    # Selecciona la base de datos
+    db_user = client["Usuario"]
+
+    db_user.contactos.update_one({"_id":ObjectId(id_contacto)}, {"$set":contact_update})
+    contact_update_list = db_user.contactos.find_one({"_id":ObjectId(id_contacto)})
+    contact_update_list = dict(contact_update_list)
+    return  JSONResponse(content=SchemaContact(contact_update_list), status_code=201)
+
+def delete_contact(id_contacto,email):
+    user_log = db.Users.find_one({"correo":email["correo"]})
+    user_log= dict(user_log)
+    # Construye la cadena de conexión
+    connection_string = user_log["url"] 
+    # Conecta a MongoDB Atlass
+    client = MongoClient(connection_string)
+    # Selecciona la base de datos
+    db_user = client["Usuario"]
+    db_user.contactos.delete_one({"_id":ObjectId(id_contacto)})
+    return JSONResponse(content={"status":"eliminado correctamente"}, status_code=200)
 
 def login(user):
     user_auth = db.Users.find_one({"correo": user["correo"]})
@@ -225,8 +255,8 @@ def hacer_merge(datos_merge, email_log):
         return JSONResponse(content={"contacts":SchemaMergeUser(list_merge)}, status_code=201)
     else :
         print("hice merge todos los contacos actuales")
-        iniciar_merge_mas_actual(list_contacts_user_logeado, list_contacts_user_merge, db_user_logeado)
-
+        lista_merge_actual = iniciar_merge_mas_actual(list_contacts_user_logeado, list_contacts_user_merge, db_user_logeado,datos_merge["email_destinatario"])
+        return JSONResponse(content={"contacts":SchemaMergeUser(lista_merge_actual)}, status_code=201)
 
 
 def iniciar_merge_todos(list_contacts_user_logeado,list_contacts_user_merge,db_user_logeado,datos_merge):
@@ -244,6 +274,38 @@ def iniciar_merge_todos(list_contacts_user_logeado,list_contacts_user_merge,db_u
         return list_merge
     
 
-def iniciar_merge_mas_actual(contactos_user_log, contactos_usuario_merge):
-    return []
+def iniciar_merge_mas_actual(list_contacts_user_logeado, list_contacts_user_merge,db_user_logeado,datos_merge):
+    exist_merge = db_user_logeado.agendas_merge.find({"usuario_merge":datos_merge})
+    exist_merge = list(exist_merge)
+    if len(exist_merge) ==0:
+        list_mas_actual = seleccionar_contactos_actuales(list_contacts_user_logeado, list_contacts_user_merge)
+        id_merge = db_user_logeado.agendas_merge.insert_one({"usuario_merge":datos_merge, "contacts":list_mas_actual}).inserted_id
+        list_merge = db_user_logeado.agendas_merge.find_one({"_id":id_merge})
+        return list_merge
+    else:
+        merge = exist_merge[0]
+        list_mas_actual = seleccionar_contactos_actuales(list_contacts_user_logeado, list_contacts_user_merge)
+        db_user_logeado.agendas_merge.update_one({"_id":merge["_id"]}, {"$set":{"contacts":list_mas_actual}})
+        list_merge = db_user_logeado.agendas_merge.find_one({"_id":merge["_id"]})
+        return list_merge
     
+def seleccionar_contactos_actuales(list_contacts_user_logeado, list_contacts_user_merge):
+    new_list_contacts = []
+    contactos_dict = {}
+    lista_contactos  = list_contacts_user_merge+ list_contacts_user_logeado
+    # Comparar contactos y almacenar los resultados
+    for contacto in lista_contactos:
+        correo = contacto["correo"]
+        dia_creado = datetime.strptime(contacto["dia_creado"], "%Y-%m-%d %H:%M:%S")
+        if correo in contactos_dict:
+            # Si el correo ya está en el diccionario, compara las fechas y actualiza si es más reciente
+            if dia_creado > contactos_dict[correo]["dia_creado"]:
+                contactos_dict[correo] = {"dia_creado": dia_creado, "contacto": contacto}
+        else:
+            # Si el correo no está en el diccionario, agrégalo
+            contactos_dict[correo] =  contacto
+
+    # Obtener la lista final de contactos
+    contactos_finales = list(contactos_dict.values())
+    new_list_contacts =contactos_finales
+    return new_list_contacts

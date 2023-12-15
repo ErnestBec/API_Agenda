@@ -2,8 +2,7 @@ def SchemaPermiso(permiso):
     return {
         "id":str(permiso["_id"]),
         "user_solicita":permiso["user_solicita"],
-        "lectura":permiso["lectura"],
-        "escritura":permiso["escritura"],
+        "lectura/escritura":permiso["lectura/escritura"],
         "merge":permiso["merge"],
         "status":permiso["status"]
     }

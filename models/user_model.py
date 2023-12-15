@@ -7,18 +7,38 @@ class direccion(BaseModel):
     num_exterior:Optional[int]
     numero_interior:Optional[int]
     colonia:str
-class User(BaseModel):
-    _id:Optional[str]
-    nombre: str 
-    correo:str
-    contraseña:str
-    url:str
+
 class Contact (BaseModel):
     _id:Optional[str]
     nombre: str
     correo:str
     telefono:int
     direccion:direccion
+
+
+
+class direccionUpdate(BaseModel):
+    calle:Optional[str]
+    cuidad:Optional[str]
+    codigo_postal:Optional[int]
+    num_exterior:Optional[int]
+    numero_interior:Optional[int]
+    colonia:Optional[str]
+
+class ContactUpdate(BaseModel):
+    _id:Optional[str]
+    nombre: Optional[str]
+    correo:Optional[str]
+    telefono:Optional[int]
+    direccion:Optional[direccion]
+
+class User(BaseModel):
+    _id:Optional[str]
+    nombre: str 
+    correo:str
+    contraseña:str
+    url:str
+    
 
 class Login(BaseModel):
     correo:str
