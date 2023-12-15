@@ -6,4 +6,4 @@ passlib
 pyjwt
 bson
 pymongo
-urllib
+urllib3
