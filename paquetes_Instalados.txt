@@ -1,7 +1,5 @@
-reactpy[fastapi]
 uvicorn[standard]
 fastapi
-reactpy_router
 passlib
 pyjwt
 bson

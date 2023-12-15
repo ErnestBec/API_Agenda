@@ -10,10 +10,10 @@ database_name = "tu_database_name"
 password = quote_plus('*ElIngenieroErnesto155MongoAtlas*')
 
 # Construye la cadena de conexión
-connection_string = f"mongodb+srv://ernest:admin123@agenda.9tknbja.mongodb.net/"  
+connection_string = "mongodb+srv://ernest:admin123@agenda.9tknbja.mongodb.net/"  
 
 # Conecta a MongoDB Atlass
-client = MongoClient(connection_string  )
+client = MongoClient(connection_string)
 
 # Selecciona la base de datos
 db = client["Agenda"]

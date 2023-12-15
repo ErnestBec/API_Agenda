@@ -59,4 +59,5 @@ def aceptar_merge(id_permiso,user = Depends(Portador())):
 @routes_user.put("/aceptar_permiso_todos/{id_permiso}")
 def aceptar_todos(id_permiso,user = Depends(Portador())):
     return aceptar_todo(id_permiso,user)
+
 # eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjb3JyZW8iOiJiZWNlZG9tQGdtYWlsLmNvbSIsImNvbnRyYXNlXHUwMGYxYSI6ImFkbWluMTIzNCIsImV4cCI6MTcwMjc0NzU2N30.jlpwqCyowYn1quRjgy6xpvsMidnrfyJBJ92xtXLD0mc
