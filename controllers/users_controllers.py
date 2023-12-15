@@ -124,7 +124,6 @@ def solicitar_merge(datos_permiso,email):
     if datos_permiso["email_destinatario"] == email["correo"]:
         print("Denegando permiso")
         return JSONResponse(content={"error":"No puedes hacer merge con tu propia agenda"}, status_code=400)
-    
     user_log = db.Users.find_one({"correo":datos_permiso["email_destinatario"]})
     user_log= dict(user_log)
     # Construye la cadena de conexión
@@ -184,6 +183,9 @@ def esta_permiso_merge(email, user_permiso):
     # Selecciona la base de datos
     db_user = client["Usuario"]
     permisos = db_user.permisos.find_one({"user_solicita":user_permiso["correo"]})
+    if not permisos:
+        return JSONResponse(content="No tienes permiso de merge", status_code=400)
+    print(permisos)
     if permisos["merge"]== False:
          return JSONResponse(content="No tienes permiso de merge", status_code=400)
     return JSONResponse(content={"status":"si tines permiso"}, status_code=200)
