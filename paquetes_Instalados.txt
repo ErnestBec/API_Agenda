@@ -1,0 +1,6 @@
+reactpy[fastapi]
+uvicorn[standard]
+reactpy_router
+passlib
+pyjwt
+bson
