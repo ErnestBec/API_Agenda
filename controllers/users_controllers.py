@@ -85,6 +85,20 @@ def delete_contact(id_contacto,email):
     db_user.contactos.delete_one({"_id":ObjectId(id_contacto)})
     return JSONResponse(content={"status":"eliminado correctamente"}, status_code=200)
 
+def contacto_id(id_contacto,email):
+    user_log = db.Users.find_one({"correo":email["correo"]})
+    user_log= dict(user_log)
+    # Construye la cadena de conexión
+    connection_string = user_log["url"] 
+    # Conecta a MongoDB Atlass
+    client = MongoClient(connection_string)
+    # Selecciona la base de datos
+    db_user = client["Usuario"]
+
+    contact =  db_user.contactos.find_one({"_id":ObjectId(id_contacto)})
+
+    return JSONResponse(content=SchemaContact(contact), status_code=200)
+
 def login(user):
     user_auth = db.Users.find_one({"correo": user["correo"]})
 

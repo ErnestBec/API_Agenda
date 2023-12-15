@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends
-from controllers.users_controllers import get_all_contacts ,nuevo_usuario,nuevo_contacto, login,solicitar_merge,get_all_users,permisos_usuario,agenda_user,aceptar_permisos_lectura,aceptar_permisos_merge,aceptar_todo, esta_permiso_merge,hacer_merge,delete_contact,update_contact
+from controllers.users_controllers import get_all_contacts ,nuevo_usuario,nuevo_contacto, login,solicitar_merge,get_all_users,permisos_usuario,agenda_user,aceptar_permisos_lectura,aceptar_permisos_merge,aceptar_todo, esta_permiso_merge,hacer_merge,delete_contact,update_contact, contacto_id
 from models.user_model import User, Login, Contact,Permiso,ContactUpdate
 from middlewares.auth_middleware import Portador 
 
@@ -21,6 +21,12 @@ def get_all_contact_routes(user = Depends(Portador())):
 @routes_user.post("/nuevo-contacto")
 def nuevo_contact_routes( contacto: Contact ,user = Depends(Portador())):
     return  nuevo_contacto(dict(user), contacto)
+
+
+@routes_user.get("/contacto_id/{id_contacto}")
+def get_contact_id(id_contacto ,user = Depends(Portador())):
+    return contacto_id(id_contacto ,user)
+
 
 @routes_user.put("/update_contact/{id_contact}")
 def update_contact_route(id_contact,contact_update: ContactUpdate ,user = Depends(Portador())):
