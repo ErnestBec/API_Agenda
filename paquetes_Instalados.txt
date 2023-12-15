@@ -4,3 +4,4 @@ reactpy_router
 passlib
 pyjwt
 bson
+pymongo
